@@ -7,6 +7,9 @@
 
 the rest end points are: 
 http://localhost:8080/api/countries
+
 http://localhost:8080/api/languages/{countryId}
+
 http://localhost:8080/api/countries/stats
+
 http://localhost:8080/api/regions
