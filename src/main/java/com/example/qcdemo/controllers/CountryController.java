@@ -1,10 +1,7 @@
 package com.example.qcdemo.controllers;
 
 import com.example.qcdemo.boundary.CountryBoundary;
-import com.example.qcdemo.wrapper.CountryStatsWrapper;
-import com.example.qcdemo.wrapper.CountryWrapper;
-import com.example.qcdemo.wrapper.LanguageWrapper;
-import com.example.qcdemo.wrapper.StatsRequestWrapper;
+import com.example.qcdemo.wrapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +28,16 @@ public class CountryController {
     public @ResponseBody
     LanguageWrapper getCountryLanguages(@PathVariable Long countryId) {
         return countryBoundary.findCountryLanguages(countryId);
+    }
+
+    @GetMapping(
+            path = "/countries/gdpperpopulation",
+            produces= MediaType.APPLICATION_JSON_VALUE
+    )
+    public @ResponseBody
+    CountryGdpWrapper getCountryStats(@RequestParam(defaultValue = "0") int page,
+                                      @RequestParam(defaultValue = "5") int size) {
+        return countryBoundary.getCountryStats(page, size);
     }
 
     @PostMapping(

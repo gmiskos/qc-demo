@@ -1,17 +1,13 @@
 package com.example.qcdemo.boundary;
 
-import com.example.qcdemo.dto.CountryDTO;
-import com.example.qcdemo.dto.CountryStatsDTO;
-import com.example.qcdemo.dto.LanguageDTO;
+import com.example.qcdemo.dto.*;
 import com.example.qcdemo.entities.Country;
 import com.example.qcdemo.entities.CountryLanguage;
+import com.example.qcdemo.entities.Stats;
 import com.example.qcdemo.service.CountryLanguageService;
 import com.example.qcdemo.service.CountryService;
 import com.example.qcdemo.service.VCountryStatsService;
-import com.example.qcdemo.wrapper.CountryStatsWrapper;
-import com.example.qcdemo.wrapper.CountryWrapper;
-import com.example.qcdemo.wrapper.LanguageWrapper;
-import com.example.qcdemo.wrapper.StatsRequestWrapper;
+import com.example.qcdemo.wrapper.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,12 +79,43 @@ public class CountryBoundary {
     public CountryStatsWrapper searchCountryStats(StatsRequestWrapper requestWrapper) {
         CountryStatsWrapper wrapper = new CountryStatsWrapper();
 
-        List<CountryStatsDTO> countryStatsDTOS;
-
         Pageable paging = PageRequest.of(requestWrapper.getPage(), requestWrapper.getSize(), Sort.by("countryName").ascending().and(Sort.by("year").descending()));
 
         wrapper = vCountryStatsService.searchCountryStats(requestWrapper.getRegionName(), requestWrapper.getYearFrom(), requestWrapper.getYearTo(),paging);
 
         return wrapper;
     }
+
+    public CountryGdpWrapper getCountryStats(int page, int size) {
+        CountryGdpWrapper wrapper = new CountryGdpWrapper();
+
+        List<GdpDTO> gdpDTOS;
+
+        Pageable paging = PageRequest.of(page, size);
+
+        Page<CountryGdpDTO> pageCtr;
+
+        pageCtr = countryService.findAllCountryGdp(paging);
+
+        gdpDTOS = new ArrayList<>();
+        gdpDTOS = pageCtr.getContent().stream().map(this::convertToGDPDto)
+                .collect(Collectors.toList());
+        wrapper.setData(gdpDTOS);
+        wrapper.setCurrentPage(pageCtr.getNumber());
+        wrapper.setTotalItems(pageCtr.getTotalElements());
+        wrapper.setTotalPages(pageCtr.getTotalPages());
+        return wrapper;
+    }
+
+    private GdpDTO convertToGDPDto(CountryGdpDTO gdp) {
+        GdpDTO gdpDTO = modelMapper.map(gdp, GdpDTO.class);
+        gdpDTO.setCountryId(gdp.getCountryId());
+        gdpDTO.setName(gdp.getName());
+        gdpDTO.setCountryCode3(gdp.getCountryCode3());
+        gdpDTO.setYear(gdp.getYear());
+        gdpDTO.setPopulation(gdp.getPopulation());
+        gdpDTO.setGdpPerPopulation(gdp.getGdpPerPopulation());
+        return gdpDTO;
+    }
+
 }

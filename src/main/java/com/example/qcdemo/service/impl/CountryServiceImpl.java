@@ -1,7 +1,10 @@
 package com.example.qcdemo.service.impl;
 
+import com.example.qcdemo.dto.CountryGdpDTO;
 import com.example.qcdemo.entities.Country;
+import com.example.qcdemo.entities.Stats;
 import com.example.qcdemo.repository.CountryRepository;
+import com.example.qcdemo.repository.StatsRepository;
 import com.example.qcdemo.service.CountryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +27,19 @@ public class CountryServiceImpl implements CountryService {
     @Autowired
     CountryRepository countryRepository;
 
+    @Autowired
+    StatsRepository statsRepository;
+
     private final EntityManager entityManager;
 
     @Override
     public Page<Country> findAllCountry(Pageable paging) {
         return countryRepository.findAll(paging);
+    }
+
+    @Override
+    public Page<CountryGdpDTO> findAllCountryGdp(Pageable paging) {
+        return statsRepository.findCountryGdp(paging);
     }
 
 
